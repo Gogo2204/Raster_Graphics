@@ -1,14 +1,9 @@
 #include <iostream>
 #include "PixMap.h"
 
-PixMap::PixMap(const MyString& fileName, unsigned magicNumber, Vector<MyString>& comments,
-    unsigned width, unsigned height, unsigned maxColour, Vector<Bitset>& data)
+PixMap::PixMap(const MyString& fileName, unsigned magicNumber, Vector <MyString>& comments,
+    unsigned width, unsigned height, unsigned maxColour, Vector <Vector<Colour>>& data) : Image(fileName, magicNumber, comments, width, height)
 {
-    this->fileName = fileName;
-    this->magicNumber = magicNumber;
-    this->comments = comments;
-    this->width = width;
-    this->height = height;
     this->maxColour = maxColour;
     this->data = data;
 }
@@ -16,4 +11,14 @@ PixMap::PixMap(const MyString& fileName, unsigned magicNumber, Vector<MyString>&
 Image* PixMap::clone() const
 {
     return new PixMap(*this);
+}
+
+unsigned PixMap::getMaxColour() const
+{
+    return maxColour;
+}
+
+const Vector<Vector<Colour>>& PixMap::getData() const
+{
+    return data;
 }

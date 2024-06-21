@@ -8,7 +8,7 @@ Image* ImageCreator::readImageFile(const MyString& fileName)
 	std::ifstream ifs(fileName.c_str());
 
 	if (!ifs.is_open())
-		throw std::exception("Canâ€™t load the image!");
+		throw std::exception("Can’t load the image!");
 
 	MyString strMagicNumber;
 	ifs >> strMagicNumber;
@@ -52,7 +52,7 @@ Image* ImageCreator::readBitMap(const MyString& fileName)
 	std::ifstream ifs(fileName.c_str());
 
 	if (!ifs.is_open())
-		throw std::exception("Canâ€™t load the image!");
+		throw std::exception("Can’t load the image!");
 
 	MyString strMagicNumber;
 	ifs >> strMagicNumber;
@@ -93,7 +93,7 @@ Image* ImageCreator::readGrayMap(const MyString& fileName)
 	std::ifstream ifs(fileName.c_str());
 
 	if (!ifs.is_open())
-		throw std::exception("Canâ€™t load the image!");
+		throw std::exception("Can’t load the image!");
 
 	MyString strMagicNumber;
 	ifs >> strMagicNumber;
@@ -136,7 +136,7 @@ Image* ImageCreator::readPixMap(const MyString& fileName)
 	std::ifstream ifs(fileName.c_str());
 
 	if (!ifs.is_open())
-		throw std::exception("Canâ€™t load the image!");
+		throw std::exception("Can’t load the image!");
 
 	MyString strMagicNumber;
 	ifs >> strMagicNumber;
@@ -153,25 +153,47 @@ Image* ImageCreator::readPixMap(const MyString& fileName)
 	ifs >> height;
 	ifs >> maxColour;
 
-	Vector<Bitset> data;
+	Vector<Vector<Colour>> data;
 
 	for (size_t i = 0; i < height; i++)
 	{
-		Bitset row(width, maxColour);
+		Vector<Colour> row;
+		
 		for (size_t j = 0; j < width; j++)
 		{
+			Colour colour;
 			unsigned temp = 0;
+
 			ifs >> temp;
-			if (temp <= maxColour)
-				row.add(j, temp);
+			colour.setRed(temp);
+			ifs >> temp;
+			colour.setGreen(temp);
+			ifs >> temp;
+			colour.setBlue(temp);
+
+			row.push_back(colour);
 		}
 		data.push_back(row);
-		row.~Bitset();
 	}
-
+	
 	ifs.close();
 
 	return new PixMap(fileName, magicNumber, comments, width, height, maxColour, data);
+}
+
+Image* ImageCreator::readBitMapBinary(const MyString& fileName)
+{
+	return nullptr;
+}
+
+Image* ImageCreator::readGrayMapBinary(const MyString& fileName)
+{
+	return nullptr;
+}
+
+Image* ImageCreator::readPixMapBinary(const MyString& fileName)
+{
+	return nullptr;
 }
 
 Vector<MyString> ImageCreator::readComments(std::ifstream& ifs)
