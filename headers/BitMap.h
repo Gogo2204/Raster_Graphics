@@ -9,4 +9,9 @@ public:
 		unsigned width, unsigned height, Vector<Bitset>& data);
 
 	Image* clone() const override;
+
+	const Vector<Bitset>& getData() const;
+
+private:
+	Vector<Bitset> data;
 };

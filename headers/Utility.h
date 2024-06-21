@@ -8,6 +8,12 @@ namespace Utility
 	constexpr size_t BUFFER = 1024;
 	constexpr uint8_t SPACE_SYMBOL = 32;
 
+	//Colours
+	constexpr uint8_t COLOUR_COUNT = 3;
+	constexpr double RED_TO_GRAY = 0.2126;
+	constexpr double GREEN_TO_GRAY = 0.7152;
+	constexpr double BLUE_TO_GRAY = 0.0722;
+
 	//'Magic numbers'
 	constexpr uint8_t DEFAULT_MAGIC_NUMBER = 0;
 	constexpr uint8_t PBM_PLAIN = 1;

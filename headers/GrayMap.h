@@ -10,6 +10,9 @@ public:
 
 	Image* clone() const override;
 
+	const Vector<Bitset>& getData() const;
+
 private:
 	unsigned maxColour = 0;
+	Vector<Bitset> data;
 };
