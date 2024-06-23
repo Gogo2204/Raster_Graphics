@@ -1,67 +1,27 @@
-#pragma once
-#include "Bitset.h"
-#include <iostream>
-#include <fstream>
+#include "BitSet.h"
 
-void Bitset::free()
+
+Bitset::Bitset(unsigned maxNumber, unsigned bits) : bitsPerNumber(bits)
 {
-	delete[] buckets;
-	maxNum = 0;
-	bits = 0;
-	bucketsCount = 0;
-}
+	if (bits < Utility::MIN_BITS || bits > Utility::MAX_BITS)
+		throw std::logic_error("invalid bit count");
 
-void Bitset::copyFrom(const Bitset& other)
-{
-	maxNum = other.maxNum;
-	bits = other.bits;
-	bucketsCount = other.bucketsCount;
-	buckets = new uint8_t[bucketsCount];
+	size = maxNumber;
+	capacity = (size + 1) * bits; // 0
+	if (capacity % Utility::BITS_IN_BYTE)
+		capacity += Utility::BITS_IN_BYTE - capacity % Utility::BITS_IN_BYTE;
 
-	for (size_t i = 0; i < bucketsCount; i++)
-		buckets[i] = other.buckets[i];
-}
-
-void Bitset::setBitsCount(unsigned bitsCount)
-{
-	if (!(bitsCount >= Utility::MIN_BITS && bitsCount <= Utility::MAX_BITS))
-		throw std::invalid_argument("The maximum bits must be in the interval [1,8]");
-	this->bits = bitsCount;
-}
-
-void Bitset::setMaxNum(unsigned maxNum)
-{
-	this->maxNum = maxNum + 1; // plus one because of zero
-}
-
-void Bitset::setBucketsCount()
-{
-	unsigned totalBits = maxNum * bits;
-
-	bucketsCount = (totalBits % Utility::MAX_BITS) ? (totalBits / Utility::MAX_BITS) + 1 :
-		(totalBits / Utility::MAX_BITS);
-}
-
-unsigned Bitset::getNumIndex(unsigned num) const
-{
-	return (num * bits);
-}
-
-Bitset::Bitset(unsigned maxNum, unsigned bitsCount)
-{
-	setBitsCount(bitsCount);
-	setMaxNum(maxNum);
-	setBucketsCount();
-
-	buckets = new uint8_t[bucketsCount];
-
-	for (size_t i = 0; i < bucketsCount; i++)
-		buckets[i] = 0;
+	container = new uint8_t[capacity / Utility::BITS_IN_BYTE]{};
 }
 
 Bitset::Bitset(const Bitset& other)
 {
 	copyFrom(other);
+}
+
+Bitset::Bitset(Bitset&& other) noexcept
+{
+	moveFrom(std::move(other));
 }
 
 Bitset& Bitset::operator=(const Bitset& other)
@@ -74,50 +34,84 @@ Bitset& Bitset::operator=(const Bitset& other)
 	return *this;
 }
 
+Bitset& Bitset::operator=(Bitset&& other) noexcept
+{
+	if (this != &other)
+	{
+		free();
+		moveFrom(std::move(other));
+	}
+	return *this;
+}
+
 Bitset::~Bitset()
 {
 	free();
 }
 
-void Bitset::add(unsigned index, unsigned value)
+unsigned Bitset::getMaxNumber() const
 {
-	if (index > maxNum)
-		throw std::invalid_argument("The number must be smaller than the max number!");
+	return size;
+}
 
-	uint8_t count = countNum(index);
-	if (count == Utility::powerOfTwo(bits) - 1)
-		throw std::overflow_error("The bucket is full");
+unsigned Bitset::getNumber(unsigned number) const
+{
+	if (number > size)
+		throw std::out_of_range("set does not contain the number");
 
-	count = value;
-	unsigned numIndex = getNumIndex(index);
-	for (size_t i = numIndex, j = bits - 1; i < (numIndex + bits); i++)
+	unsigned idx = number * bitsPerNumber;
+	unsigned ret = 0;
+
+	for (unsigned i = 0; i < bitsPerNumber; i++, idx++)
 	{
-		unsigned bucketIndex = i / Utility::MAX_BITS;
-		unsigned bitIndex = i % Utility::MAX_BITS;
+		ret <<= 1;
+		ret += Utility::getBit(container[idx / Utility::BITS_IN_BYTE], idx % Utility::BITS_IN_BYTE);
+	}
 
-		if (Utility::checkBit(count, j--))
-			Utility::makeBitOne(buckets[bucketIndex], bitIndex);
-		else
-			Utility::makeBitZero(buckets[bucketIndex], bitIndex);
+	return ret;
+}
+
+void Bitset::setNumber(unsigned number, unsigned value)
+{
+	if (number > size)
+		throw std::out_of_range("set does not contain the number");
+
+	unsigned idx = (number + 1) * bitsPerNumber - 1;//0
+
+	for (unsigned i = 0; i < bitsPerNumber; i++, idx--)
+	{
+		Utility::setBit(container[idx / Utility::BITS_IN_BYTE], idx % Utility::BITS_IN_BYTE, Utility::getBit(value, i));
 	}
 }
 
-uint8_t Bitset::countNum(unsigned num) const
+void Bitset::free()
 {
-	if (num > maxNum)
-		throw std::invalid_argument("The number must be smaller than the max number!");
+	delete[] container;
+	size = 0;
+	capacity = 0;
+}
 
-	unsigned numIndex = getNumIndex(num);
-	uint8_t res = 0;
-	for (size_t i = numIndex, j = bits - 1; i < (numIndex + bits); i++)
+void Bitset::copyFrom(const Bitset& other)
+{
+	capacity = other.capacity;
+	size = other.size;
+	bitsPerNumber = other.bitsPerNumber;
+	container = new uint8_t[capacity / Utility::BITS_IN_BYTE]{};
+
+	for (unsigned i = 0; i <= size; i++)
 	{
-		unsigned bucketIndex = i / Utility::MAX_BITS;
-		unsigned bitIndex = i % Utility::MAX_BITS;
-
-		if (Utility::checkBit(buckets[bucketIndex], bitIndex))
-			Utility::makeBitOne(res, j--);
-		else
-			Utility::makeBitZero(res, j--);
+		setNumber(i, other.getNumber(i));
 	}
-	return res;
+}
+
+void Bitset::moveFrom(Bitset&& other) noexcept
+{
+	capacity = other.capacity;
+	other.capacity = 0;
+
+	size = other.size;
+	other.size = 0;
+
+	container = other.container;
+	other.container = nullptr;
 }

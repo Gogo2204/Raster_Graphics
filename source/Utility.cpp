@@ -1,33 +1,6 @@
 #include <iostream>
 #include "Utility.h"
 
-bool Utility::checkBit(unsigned num, unsigned index)
-{
-	unsigned mask = 1;
-	mask <<= index;
-	return (mask & num) == mask;
-}
-
-void Utility::makeBitZero(uint8_t& num, unsigned index)
-{
-	uint8_t mask = 1;
-	mask <<= index;
-	mask = ~mask;
-	num &= mask;
-}
-
-void Utility::makeBitOne(uint8_t& num, unsigned index)
-{
-	uint8_t mask = 1;
-	mask <<= index;
-	num |= mask;
-}
-
-unsigned Utility::powerOfTwo(size_t power)
-{
-	return 1 << power;
-}
-
 unsigned Utility::findBitsCount(unsigned num)
 {
 	unsigned count = 0;
@@ -42,4 +15,25 @@ unsigned Utility::findBitsCount(unsigned num)
 int Utility::convertToNum(char ch)
 {
 	return ch - '0';
+}
+
+bool Utility::getBit(uint8_t num, unsigned pos)
+{
+	uint8_t mask = 1 << pos;
+	return (num & mask);
+}
+
+void Utility::setBit(uint8_t& num, unsigned pos, bool value)
+{
+	uint8_t mask = 1 << pos;
+
+	if (value)
+	{
+		num |= mask;
+	}
+	else
+	{
+		mask = ~mask;
+		num &= mask;
+	}
 }

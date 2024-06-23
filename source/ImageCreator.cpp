@@ -54,8 +54,10 @@ Image* ImageCreator::readBitMap(const MyString& fileName)
 	if (!ifs.is_open())
 		throw std::exception("Can’t load the image!");
 
-	MyString strMagicNumber;
-	ifs >> strMagicNumber;
+	char temp1[Utility::BUFFER];
+	ifs.getline(temp1, Utility::BUFFER);
+
+	MyString strMagicNumber(temp1);
 
 	unsigned magicNumber = Utility::convertToNum(strMagicNumber[1]);
 
@@ -71,16 +73,17 @@ Image* ImageCreator::readBitMap(const MyString& fileName)
 
 	for (size_t i = 0; i < height; i++)
 	{
-		Bitset row(width, 1);
+		Bitset row(width, Utility::MIN_BITS);
 		for (size_t j = 0; j < width; j++)
 		{
-			unsigned temp = ifs.get();
-			if (temp == Utility::SPACE_SYMBOL)
+			unsigned temp;
+			ifs >> temp;
+			if (temp != Utility::PBM_DARK && temp != Utility::PBM_WHITE)
 				j--;
-			row.add(j, temp);
+			else 
+				row.setNumber(j, temp);
 		}
 		data.push_back(row);
-		row.~Bitset();
 	}
 
 	ifs.close();
@@ -95,8 +98,10 @@ Image* ImageCreator::readGrayMap(const MyString& fileName)
 	if (!ifs.is_open())
 		throw std::exception("Can’t load the image!");
 
-	MyString strMagicNumber;
-	ifs >> strMagicNumber;
+	char temp1[Utility::BUFFER];
+	ifs.getline(temp1, Utility::BUFFER);
+
+	MyString strMagicNumber(temp1);
 
 	unsigned magicNumber = Utility::convertToNum(strMagicNumber[1]);
 
@@ -114,16 +119,15 @@ Image* ImageCreator::readGrayMap(const MyString& fileName)
 
 	for (size_t i = 0; i < height; i++)
 	{
-		Bitset row(width, maxColour);
+		Bitset row(width, Utility::findBitsCount(maxColour));
 		for (size_t j = 0; j < width; j++)
 		{
 			unsigned temp = 0;
 			ifs >> temp;
 			if (temp <= maxColour)
-				row.add(j, temp);
+				row.setNumber(j, temp);
 		}
 		data.push_back(row);
-		row.~Bitset();
 	}
 
 	ifs.close();
@@ -138,8 +142,10 @@ Image* ImageCreator::readPixMap(const MyString& fileName)
 	if (!ifs.is_open())
 		throw std::exception("Can’t load the image!");
 
-	MyString strMagicNumber;
-	ifs >> strMagicNumber;
+	char temp1[Utility::BUFFER];
+	ifs.getline(temp1, Utility::BUFFER);
+
+	MyString strMagicNumber(temp1);
 
 	unsigned magicNumber = Utility::convertToNum(strMagicNumber[1]);
 
@@ -202,15 +208,19 @@ Vector<MyString> ImageCreator::readComments(std::ifstream& ifs)
 
 	MyString row;
 	char temp[Utility::BUFFER];
+
+	int getPointer = ifs.tellg();
 	ifs.getline(temp, Utility::BUFFER);
 	row = temp;
 
-	while (!row.c_str() && row[0] == Utility::COMMENT_SYMBOL)
+	while (row[0] == Utility::COMMENT_SYMBOL)
 	{
 		comments.push_back(row);
+		getPointer = ifs.tellg();
 		ifs.getline(temp, Utility::BUFFER);
 		row = temp;
 	}
-
+	ifs.seekg(getPointer);
+	
 	return comments;
 }

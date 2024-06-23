@@ -1,4 +1,3 @@
-#include <iostream>
 #include "PixMap.h"
 
 PixMap::PixMap(const MyString& fileName, unsigned magicNumber, Vector <MyString>& comments,
@@ -21,4 +20,20 @@ unsigned PixMap::getMaxColour() const
 const Vector<Vector<Colour>>& PixMap::getData() const
 {
     return data;
+}
+
+void PixMap::rotate(bool direction)
+{
+}
+
+void PixMap::save(const MyString& newFileName) const
+{
+}
+
+void PixMap::rotateLeft()
+{
+}
+
+void PixMap::rotateRight()
+{
 }
