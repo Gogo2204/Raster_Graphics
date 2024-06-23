@@ -12,6 +12,15 @@ public:
 
 	const Vector<Bitset>& getData() const;
 
+	void rotate(bool direction) override;
+	void save(const MyString& newFileName) const override;
+
 private:
 	Vector<Bitset> data;
+
+	void rotateLeft();
+	void rotateRight();
+
+	void savePlain(const MyString& newFileName) const;
+	void saveRaw(const MyString& newFileName) const;
 };

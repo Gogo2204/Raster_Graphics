@@ -13,7 +13,13 @@ public:
 	unsigned getMaxColour() const;
 	const Vector<Vector<Colour>>& getData() const;
 
+	void rotate(bool direction) override;
+	void save(const MyString& newFileName) const override;
+
 private:
 	unsigned maxColour = 0;
 	Vector<Vector<Colour>> data;
+
+	void rotateLeft();
+	void rotateRight();
 };

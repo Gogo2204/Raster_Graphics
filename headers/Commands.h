@@ -1,5 +1,8 @@
 #pragma once
 #include "Image.h"
+#include "BitMap.h"
+#include "GrayMap.h"
+#include "PixMap.h"
 #include "Polymorfic_Ptr.hpp"
 
 class Commands
@@ -13,5 +16,5 @@ public:
 	virtual ~Commands() = default;
 
 protected:
-	Vector< Polymorphic_Ptr<Image> >& images;
+	Vector<Polymorphic_Ptr<Image>>& images;
 };

@@ -1,6 +1,5 @@
 #pragma once
 #include "Commands.h"
-#include "GrayMap.h"
 
 class Grayscale : public Commands
 {

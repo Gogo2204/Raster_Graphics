@@ -1,31 +1,31 @@
 #pragma once
 #include <iostream>
-#include "Utility.h";
+#include "Utility.h"
 
 class Bitset
 {
-private:
-	uint8_t* buckets = nullptr;
-	unsigned maxNum = 0;
-	unsigned bits = 0;
+public:
+	Bitset() = default;
+	Bitset(unsigned maxNumber, unsigned bits);
+	Bitset(const Bitset& other);
+	Bitset(Bitset&& other)noexcept;
+	Bitset& operator=(const Bitset& other);
+	Bitset& operator=(Bitset&& other)noexcept;
+	~Bitset();
 
-	size_t bucketsCount = 0;
+	unsigned getMaxNumber()const;
+
+	unsigned getNumber(unsigned number)const;
+	void setNumber(unsigned number, unsigned value);
+
+private:
 
 	void free();
 	void copyFrom(const Bitset& other);
+	void moveFrom(Bitset&& other)noexcept;
 
-	void setBitsCount(unsigned bitsCount);
-	void setMaxNum(unsigned maxNum);
-	void setBucketsCount();
-
-	unsigned getNumIndex(unsigned num) const;
-public:
-	Bitset() = default;
-	Bitset(unsigned maxNum, unsigned bitsCount);
-	Bitset(const Bitset& other);
-	Bitset& operator=(const Bitset& other);
-	~Bitset();
-
-	void add(unsigned index, unsigned value);
-	uint8_t countNum(unsigned num) const;
+	uint8_t* container = nullptr;
+	unsigned size = 0;
+	unsigned capacity = 0;
+	unsigned bitsPerNumber = Utility::MIN_BITS;
 };

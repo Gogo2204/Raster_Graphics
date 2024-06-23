@@ -20,6 +20,9 @@ public:
 	unsigned getHeight() const;
 	const Vector<MyString>& getComments() const;
 
+	virtual void rotate(bool direction) = 0;
+	virtual void save(const MyString& newFileName) const = 0;
+
 protected:
 	MyString fileName;
 	unsigned magicNumber = Utility::DEFAULT_MAGIC_NUMBER;
