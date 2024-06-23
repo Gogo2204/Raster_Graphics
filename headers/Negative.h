@@ -8,6 +8,7 @@ public:
 	Negative(Vector<Polymorphic_Ptr<Image>>& images);
 
 	void execute() override;
+	MyString message() const override;
 
 	Commands* clone() const override;
 

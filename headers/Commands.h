@@ -3,14 +3,15 @@
 #include "BitMap.h"
 #include "GrayMap.h"
 #include "PixMap.h"
-#include "Polymorfic_Ptr.hpp"
+#include "Polymorphic_Ptr.hpp"
 
 class Commands
 {
 public:
-	Commands(Vector< Polymorphic_Ptr<Image> >& images) : images(images) {}
+	Commands(Vector<Polymorphic_Ptr<Image>>& images) : images(images) {}
 
 	virtual void execute() = 0;
+	virtual MyString message() const = 0;
 
 	virtual Commands* clone() const = 0;
 	virtual ~Commands() = default;

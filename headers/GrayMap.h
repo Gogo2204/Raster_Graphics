@@ -22,4 +22,7 @@ private:
 
 	void rotateLeft();
 	void rotateRight();
+
+	void savePlain(const MyString& newFileName) const;
+	void saveRaw(const MyString& newFileName) const;
 };

@@ -1,124 +1,65 @@
 #pragma once
 #include <iostream>
-#include <exception>
+#include "Utility.h"
 
-template <typename T>
+template<class T>
 class Vector
 {
-private:
-	T* data = nullptr;
-	size_t size = 0;
-	size_t capacity = 0;
-
-	void copyFrom(const Vector<T>& other);
-	void moveFrom(Vector<T>&& other);
-	void free();
-	void resize();
-
 public:
 	Vector();
-	Vector(size_t size);
-
-	Vector(const Vector <T>& other);
-	Vector<T>& operator=(const Vector<T>& other);
-
+	Vector(size_t capacity);
+	Vector(const Vector<T>& other);
 	Vector(Vector<T>&& other) noexcept;
-	Vector<T>& operator=(Vector<T>&& other) noexcept;
+	Vector<T>& operator=(const Vector<T>& other);
+	Vector& operator=(Vector<T>&& other) noexcept;
+	~Vector();
 
-	T& operator[](size_t index);
-	const T& operator[](size_t index) const;
-
-	~Vector() noexcept;
-
-	void push_back(const T& elem);
-	void push_back(const T&& elem) noexcept;
+	void push_back(const T& newElem);
+	void push_back(T&& newElem);
 
 	void pop_back();
 
-	void insert(const T& elem, size_t index);
-	void insert(const T&& elem, size_t index);
+	void setAtIndex(const T& element, size_t index);
+	void setAtIndex(T&& element, size_t index);
 
-	void erase(size_t index);
-	void clear();
-	bool isEmpty() const;
 	size_t getSize() const;
+	bool isEmpty() const;
+
+	const T& operator[](size_t index) const;
+	T& operator[](size_t index);
+
+private:
+	void free();
+	void copyFrom(const Vector<T>& other);
+	void moveFrom(Vector<T>&& other);
+
+	void resize(size_t newCap);
+
+	T* arr = nullptr;
+	size_t size = Utility::DEFAULT_SIZE;
+	size_t capacity = Utility::DEFAULT_CAPACITY;
 };
 
-template <typename T>
-void Vector<T>::copyFrom(const Vector<T>& other)
+template<class T>
+Vector<T>::Vector() : Vector(8) {}
+
+template<class T>
+Vector<T>::Vector(size_t capacity) : size(0)
 {
-	data = new T[other.size];
-	for (size_t i = 0; i < other.size; i++)
-	{
-		data[i] = other.data[i];
-	}
-	size = other.size;
-	capacity = other.capacity;
+	this->capacity = Utility::nextPowerOfTwo(capacity);
+	arr = new T[this->capacity];
 }
 
 template<class T>
-void Vector<T>::moveFrom(Vector<T>&& other)
-{
-	data = other.data;
-	other.data = nullptr;
-
-	size = other.size;
-	other.size = 0;
-
-	capacity = other.capacity;
-	other.capacity = 0;
-}
-
-template <typename T>
-void Vector<T>::free()
-{
-	delete[] data;
-	data = nullptr;
-	size = 0;
-	capacity = 0;
-}
-
-template <typename T>
-void Vector<T>::resize()
-{
-	size_t newCap = (capacity + 1) * 2;
-	T* newData = new T[newCap];
-	capacity = newCap - 1;
-
-	for (size_t i = 0; i < size; i++)
-	{
-		newData[i] = data[i];
-	}
-
-	delete[] data;
-	data = newData;
-}
-
-template <typename T>
-Vector<T>::Vector()
-{
-	size = 0;
-	capacity = 8;
-	data = new T[capacity];
-}
-
-template <typename T>
-Vector<T> ::Vector(size_t size)
-{
-	this->size = 0;
-	capacity = size;
-	data = new T[capacity];
-}
-
-template <typename T>
-Vector<T> ::Vector(const Vector <T>& other)
+Vector<T>::Vector(const Vector<T>& other)
 {
 	copyFrom(other);
 }
 
-template <typename T>
-Vector<T>& Vector<T> :: operator=(const Vector<T>& other)
+template<class T>
+Vector<T>& Vector<T>::operator=(const Vector<T>& other)
 {
+
 	if (this != &other)
 	{
 		free();
@@ -127,15 +68,22 @@ Vector<T>& Vector<T> :: operator=(const Vector<T>& other)
 	return *this;
 }
 
-template <typename T>
-Vector<T> ::Vector(Vector<T>&& other) noexcept
+template<class T>
+Vector<T>::~Vector()
+{
+	free();
+}
+
+template<class T>
+Vector<T>::Vector(Vector<T>&& other) noexcept
 {
 	moveFrom(std::move(other));
 }
 
-template <typename T>
+template<class T>
 Vector<T>& Vector<T>::operator=(Vector<T>&& other) noexcept
 {
+
 	if (this != &other)
 	{
 		free();
@@ -144,113 +92,121 @@ Vector<T>& Vector<T>::operator=(Vector<T>&& other) noexcept
 	return *this;
 }
 
-template <typename T>
-T& Vector<T>::operator[](size_t index)
+template<class T>
+void Vector<T>::copyFrom(const Vector<T>& other)
 {
-	if (index >= size)
-		throw std::out_of_range("The index is out of range!");
-	return data[index];
+
+	arr = new T[other.capacity];
+
+	for (size_t i = 0; i < other.size; i++)
+		arr[i] = other.arr[i];
+
+	size = other.size;
+	capacity = other.capacity;
 }
 
-template <typename T>
-const T& Vector<T>::operator[](size_t index) const
+template<class T>
+void Vector<T>::moveFrom(Vector<T>&& other)
 {
-	if (index >= size)
-		throw std::out_of_range("The index is out of range!");
-	return data[index];
+	arr = other.arr;
+	other.arr = nullptr;
+	size = other.size;
+	capacity = other.capacity;
 }
 
-template <typename T>
-Vector<T>::~Vector() noexcept
+template<class T>
+void Vector<T>::free()
 {
-	free();
+	delete[] arr;
 }
 
-template <typename T>
-void Vector<T>::push_back(const T& elem)
+template<class T>
+void Vector<T>::resize(size_t newCap)
 {
-	if (size == capacity)
-		resize();
-	size++;
-	data[size - 1] = elem;
+	T* temp = arr;
+	arr = new T[newCap];
+
+	for (size_t i = 0; i < size; i++)
+		arr[i] = temp[i];
+
+	capacity = newCap;
+	delete[] temp;
 }
 
-template <typename T>
-void Vector<T>::push_back(const T&& elem) noexcept
+template<class T>
+void Vector<T>::push_back(const T& newElem)
 {
-	if (size == capacity)
-		resize();
-	size++;
-	data[size - 1] = std::move(elem);
+	if (size >= capacity)
+		resize(capacity * 2);
+
+	arr[size++] = newElem;
 }
 
-template <typename T>
+template<class T>
+void Vector<T>::push_back(T&& newElem)
+{
+	if (size >= capacity)
+		resize(capacity * 2);
+
+	arr[size++] = std::move(newElem);
+}
+
+template<class T>
 void Vector<T>::pop_back()
 {
-	if (isEmpty())
-		throw std::logic_error("The vector is already empty!");
-	size--;
+	if (size)
+		size--;
+	else
+		throw std::length_error("Already empty!");
+
+	if (size * 4 <= capacity && capacity > 1)
+		resize(capacity / 2);
 }
 
-template <typename T>
-void Vector<T>::insert(const T& elem, size_t index)
+template<class T>
+void Vector<T>::setAtIndex(const T& element, size_t index)
 {
 	if (index >= size)
-		throw std::out_of_range("The index is out of range!");
+		throw std::length_error("No such index!");
 
-	if (size == capacity)
-		resize();
-
-	size++;
-	for (int i = size - 1; i > index; i--)
-		data[i] = data[i - 1];
-
-	data[index] = elem;
+	arr[index] = element;
 }
 
-template <typename T>
-void Vector<T>::insert(const T&& elem, size_t index)
+template<class T>
+void Vector<T>::setAtIndex(T&& element, size_t index)
 {
 	if (index >= size)
-		throw std::out_of_range("The index is out of range!");
+		throw std::length_error("No such index!");
 
-	if (size == capacity)
-		resize();
-
-	size++;
-	for (int i = size - 1; i > index; i--)
-		data[i] = std::move(data[i - 1]);
-
-	data[index] = std::move(elem);
+	arr[index] = std::move(element);
 }
 
-template <typename T>
-void Vector<T>::erase(size_t index)
-{
-	if (index >= size)
-		throw std::out_of_range("The index is out of range!");
-
-	for (size_t i = index; i < size - 1; i++)
-		data[i] = std::move(data[i + 1]);
-	size--;
-}
-
-template <typename T>
-void Vector<T>::clear()
-{
-	free();
-	capacity = 8;
-	data = new T[capacity];
-}
-
-template <typename T>
-bool Vector<T>::isEmpty() const
-{
-	return size == 0;
-}
-
-template <typename T>
+template<class T>
 size_t Vector<T>::getSize() const
 {
-	return this->size;
+	return size;
+}
+
+template<class T>
+bool Vector<T>::isEmpty() const
+{
+	return size == Utility::DEFAULT_SIZE;
+}
+
+
+template<class T>
+const T& Vector<T>::operator[](size_t index) const
+{
+	if (index > size)
+		throw std::out_of_range("Out of range!");
+	return arr[index];
+}
+
+
+template<class T>
+T& Vector<T>::operator[](size_t index)
+{
+	if (index > size)
+		throw std::out_of_range("Out of range!");
+	return arr[index];
 }

@@ -8,6 +8,8 @@ public:
 	Rotate(Vector<Polymorphic_Ptr<Image>>& images, bool direction);
 
 	void execute() override;
+	MyString message() const override;
+
 	Commands* clone() const override;
 
 private:

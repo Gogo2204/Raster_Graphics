@@ -9,6 +9,8 @@ public:
 	Save(Vector<Polymorphic_Ptr<Image>>& images, const MyString& newFileName);
 
 	void execute() override;
+	MyString message() const override;
+
 	Commands* clone() const override;
 
 private:
