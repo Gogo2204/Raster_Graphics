@@ -21,7 +21,8 @@ void SessionManager::switchSession(unsigned index)
 
 void SessionManager::closeSession()
 {
-	//sessions.erase(currentSession);
+	sessions.erase(currentSession);
+	currentSession--;
 }
 
 Session* SessionManager::getCurrentSession()
