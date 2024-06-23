@@ -28,6 +28,11 @@ void Monochrome::execute()
 	}
 }
 
+MyString Monochrome::message() const
+{
+	return MyString("monochrome");
+}
+
 Commands* Monochrome::clone() const
 {
 	return new Monochrome(*this);
@@ -58,8 +63,9 @@ BitMap* Monochrome::fromGrayToBitMap(size_t index)
 	}
 
 	Vector<MyString> comments = grayMap->getComments();
+	unsigned newMagicNumber = grayMap->getMagicNumber() == Utility::PGM_PLAIN ? Utility::PBM_PLAIN : Utility::PBM_RAW;
 
-	return new BitMap(grayMap->getFileName(), grayMap->getMagicNumber(), comments, grayMap->getWidth(),
+	return new BitMap(grayMap->getFileName(), newMagicNumber, comments, grayMap->getWidth(),
 		grayMap->getHeight(), bitMapData);
 }
 
@@ -94,6 +100,7 @@ BitMap* Monochrome::fromPixToBitMap(size_t index)
 	}
 
 	Vector<MyString> comments = pixMap->getComments();
+	unsigned newMagicNumber = pixMap->getMagicNumber() == Utility::PPM_PLAIN ? Utility::PBM_PLAIN : Utility::PBM_RAW;
 
 	return new BitMap(pixMap->getFileName(), pixMap->getMagicNumber(), comments, pixMap->getWidth(),
 		pixMap->getHeight(), bitMapData);

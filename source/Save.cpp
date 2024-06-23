@@ -15,6 +15,11 @@ void Save::execute()
 		SaveAs();
 }
 
+MyString Save::message() const
+{
+	return MyString("save");
+}
+
 Commands* Save::clone() const
 {
 	return new Save(*this);
@@ -31,4 +36,8 @@ void Save::SaveAll()
 void Save::SaveAs()
 {
 	images[0]->save(newFileName);
+	for (size_t i = 1; i < images.getSize(); i++)
+	{
+		images[i]->save(images[i].get()->getFileName());
+	}
 }

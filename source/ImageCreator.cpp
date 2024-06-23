@@ -52,7 +52,7 @@ Image* ImageCreator::readBitMap(const MyString& fileName)
 	std::ifstream ifs(fileName.c_str());
 
 	if (!ifs.is_open())
-		throw std::exception("Can’t load the image!");
+		throw std::exception("Can not load the image!");
 
 	char temp1[Utility::BUFFER];
 	ifs.getline(temp1, Utility::BUFFER);
@@ -96,7 +96,7 @@ Image* ImageCreator::readGrayMap(const MyString& fileName)
 	std::ifstream ifs(fileName.c_str());
 
 	if (!ifs.is_open())
-		throw std::exception("Can’t load the image!");
+		throw std::exception("Can not load the image!");
 
 	char temp1[Utility::BUFFER];
 	ifs.getline(temp1, Utility::BUFFER);
@@ -140,7 +140,7 @@ Image* ImageCreator::readPixMap(const MyString& fileName)
 	std::ifstream ifs(fileName.c_str());
 
 	if (!ifs.is_open())
-		throw std::exception("Can’t load the image!");
+		throw std::exception("Can not load the image!");
 
 	char temp1[Utility::BUFFER];
 	ifs.getline(temp1, Utility::BUFFER);

@@ -12,6 +12,11 @@ void Grayscale::execute()
 	}
 }
 
+MyString Grayscale::message() const
+{
+	return MyString("grayscale");
+}
+
 Commands* Grayscale::clone() const
 {
 	return new Grayscale(*this);
@@ -38,7 +43,8 @@ GrayMap* Grayscale::turnToGrayMap(size_t index)
 	}
 
 	Vector<MyString> comments = pixMap->getComments();
+	unsigned newMagicNumber = pixMap->getMagicNumber() == Utility::PPM_PLAIN ? Utility::PGM_PLAIN : Utility::PGM_RAW;
 
-	return new GrayMap(pixMap->getFileName(), pixMap->getMagicNumber(), comments, pixMap->getWidth(),
+	return new GrayMap(pixMap->getFileName(), newMagicNumber, comments, pixMap->getWidth(),
 		pixMap->getHeight(), pixMap->getMaxColour(), grayMapData);
 }

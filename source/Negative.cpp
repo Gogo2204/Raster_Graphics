@@ -28,6 +28,11 @@ void Negative::execute()
 	}
 }
 
+MyString Negative::message() const
+{
+	return MyString("negative");
+}
+
 Commands* Negative::clone() const
 {
 	return new Negative(*this);

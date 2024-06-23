@@ -6,8 +6,8 @@ unsigned Utility::findBitsCount(unsigned num)
 	unsigned count = 0;
 	while (num)
 	{
-		num = 1 >> num;
-		count++;
+		count += num & 1;
+		num >>= 1; 
 	}
 	return count;
 }
@@ -36,4 +36,16 @@ void Utility::setBit(uint8_t& num, unsigned pos, bool value)
 		mask = ~mask;
 		num &= mask;
 	}
+}
+
+unsigned Utility::nextPowerOfTwo(unsigned n)
+{
+	unsigned step = 1;
+
+	while ((n >> step) > 0) {
+		n |= n >> step;
+		step <<= 1;
+	}
+
+	return n + 1;
 }

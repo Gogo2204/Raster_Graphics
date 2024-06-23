@@ -2,7 +2,7 @@
 
 Rotate::Rotate(Vector<Polymorphic_Ptr<Image>>& images, bool direction) : Commands(images)
 {
-	this->direction = direction;
+	this->direction = direction;	
 }
 
 void Rotate::execute()
@@ -11,6 +11,13 @@ void Rotate::execute()
 	{
 		images[i].get()->rotate(direction);
 	}
+}
+
+MyString Rotate::message() const
+{
+	if(direction)
+		return MyString("rotate right");
+	return MyString("rotate left");
 }
 
 Commands* Rotate::clone() const
