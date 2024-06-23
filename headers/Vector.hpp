@@ -23,6 +23,7 @@ public:
 	void setAtIndex(T&& element, size_t index);
 
 	size_t getSize() const;
+	void erase(size_t index);
 	bool isEmpty() const;
 
 	const T& operator[](size_t index) const;
@@ -181,6 +182,17 @@ void Vector<T>::setAtIndex(T&& element, size_t index)
 	arr[index] = std::move(element);
 }
 
+template <typename T>
+void Vector<T>::erase(size_t index)
+{
+	if (index >= size)
+		throw std::out_of_range("The index is out of range!");
+
+	for (size_t i = index; i < size - 1; i++)
+		arr[i] = std::move(arr[i + 1]);
+	size--;
+}
+
 template<class T>
 size_t Vector<T>::getSize() const
 {
@@ -192,7 +204,6 @@ bool Vector<T>::isEmpty() const
 {
 	return size == Utility::DEFAULT_SIZE;
 }
-
 
 template<class T>
 const T& Vector<T>::operator[](size_t index) const
