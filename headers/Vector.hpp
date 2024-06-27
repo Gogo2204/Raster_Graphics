@@ -23,6 +23,7 @@ public:
 	void setAtIndex(T&& element, size_t index);
 
 	size_t getSize() const;
+	void clear();
 	void erase(size_t index);
 	bool isEmpty() const;
 
@@ -36,7 +37,7 @@ private:
 
 	void resize(size_t newCap);
 
-	T* arr = nullptr;
+	T* data = nullptr;
 	size_t size = Utility::DEFAULT_SIZE;
 	size_t capacity = Utility::DEFAULT_CAPACITY;
 };
@@ -48,7 +49,7 @@ template<class T>
 Vector<T>::Vector(size_t capacity) : size(0)
 {
 	this->capacity = Utility::nextPowerOfTwo(capacity);
-	arr = new T[this->capacity];
+	data = new T[this->capacity];
 }
 
 template<class T>
@@ -97,10 +98,10 @@ template<class T>
 void Vector<T>::copyFrom(const Vector<T>& other)
 {
 
-	arr = new T[other.capacity];
+	data = new T[other.capacity];
 
 	for (size_t i = 0; i < other.size; i++)
-		arr[i] = other.arr[i];
+		data[i] = other.data[i];
 
 	size = other.size;
 	capacity = other.capacity;
@@ -109,8 +110,8 @@ void Vector<T>::copyFrom(const Vector<T>& other)
 template<class T>
 void Vector<T>::moveFrom(Vector<T>&& other)
 {
-	arr = other.arr;
-	other.arr = nullptr;
+	data = other.data;
+	other.data = nullptr;
 	size = other.size;
 	capacity = other.capacity;
 }
@@ -118,17 +119,17 @@ void Vector<T>::moveFrom(Vector<T>&& other)
 template<class T>
 void Vector<T>::free()
 {
-	delete[] arr;
+	delete[] data;
 }
 
 template<class T>
 void Vector<T>::resize(size_t newCap)
 {
-	T* temp = arr;
-	arr = new T[newCap];
+	T* temp = data;
+	data = new T[newCap];
 
 	for (size_t i = 0; i < size; i++)
-		arr[i] = temp[i];
+		data[i] = temp[i];
 
 	capacity = newCap;
 	delete[] temp;
@@ -140,7 +141,7 @@ void Vector<T>::push_back(const T& newElem)
 	if (size >= capacity)
 		resize(capacity * 2);
 
-	arr[size++] = newElem;
+	data[size++] = newElem;
 }
 
 template<class T>
@@ -149,7 +150,7 @@ void Vector<T>::push_back(T&& newElem)
 	if (size >= capacity)
 		resize(capacity * 2);
 
-	arr[size++] = std::move(newElem);
+	data[size++] = std::move(newElem);
 }
 
 template<class T>
@@ -170,7 +171,7 @@ void Vector<T>::setAtIndex(const T& element, size_t index)
 	if (index >= size)
 		throw std::length_error("No such index!");
 
-	arr[index] = element;
+	data[index] = element;
 }
 
 template<class T>
@@ -179,7 +180,15 @@ void Vector<T>::setAtIndex(T&& element, size_t index)
 	if (index >= size)
 		throw std::length_error("No such index!");
 
-	arr[index] = std::move(element);
+	data[index] = std::move(element);
+}
+
+template <typename T>
+void Vector<T>::clear()
+{
+	free();
+	capacity = 8;
+	data = new T[capacity];
 }
 
 template <typename T>
@@ -189,7 +198,7 @@ void Vector<T>::erase(size_t index)
 		throw std::out_of_range("The index is out of range!");
 
 	for (size_t i = index; i < size - 1; i++)
-		arr[i] = std::move(arr[i + 1]);
+		data[i] = std::move(data[i + 1]);
 	size--;
 }
 
@@ -208,16 +217,16 @@ bool Vector<T>::isEmpty() const
 template<class T>
 const T& Vector<T>::operator[](size_t index) const
 {
-	if (index > size)
-		throw std::out_of_range("Out of range!");
-	return arr[index];
+	if (index >= capacity)
+		throw std::out_of_range("The index is out of range!");
+	return data[index];
 }
 
 
 template<class T>
 T& Vector<T>::operator[](size_t index)
 {
-	if (index > size)
-		throw std::out_of_range("Out of range!");
-	return arr[index];
+	if (index >= capacity)
+		throw std::out_of_range("The index is out of range!");
+	return data[index];
 }
