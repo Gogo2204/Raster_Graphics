@@ -102,6 +102,6 @@ BitMap* Monochrome::fromPixToBitMap(size_t index)
 	Vector<MyString> comments = pixMap->getComments();
 	unsigned newMagicNumber = pixMap->getMagicNumber() == Utility::PPM_PLAIN ? Utility::PBM_PLAIN : Utility::PBM_RAW;
 
-	return new BitMap(pixMap->getFileName(), pixMap->getMagicNumber(), comments, pixMap->getWidth(),
+	return new BitMap(pixMap->getFileName(), newMagicNumber, comments, pixMap->getWidth(),
 		pixMap->getHeight(), bitMapData);
 }

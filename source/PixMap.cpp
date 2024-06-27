@@ -43,12 +43,14 @@ void PixMap::rotateLeft()
 {
     Vector<Vector<Colour>> newData;
 
-    for (size_t j = width; j > 0; --j)
-    {     
-        for (size_t i = 0; i < height; i++)
-        {
-            newData[j][i] = data[i][j - 1];
-        }      
+    for (size_t i = 0; i < width; i++)
+    {
+        Vector<Colour> newRow;
+        for (size_t j = 0; j < height; j++)
+        {            
+            newRow.push_back(data[j][width - 1 - i]);           
+        }
+        newData.push_back(newRow);
     }
 
     data = newData;
@@ -56,15 +58,17 @@ void PixMap::rotateLeft()
 }
 
 void PixMap::rotateRight()
-{
+{    
     Vector<Vector<Colour>> newData;
 
-    for (size_t j = 0; j < width; j++)
-    {      
-        for (size_t i = 0; i < height; i++)
+    for (size_t i = 0; i < width; i++)
+    {
+        Vector<Colour> newRow;
+        for (size_t j = 0; j < height; j++)
         {
-            newData[j][i] = data[height - 1 - i][j];           
-        }        
+            newRow.push_back(data[height - 1 - j][i]);
+        }
+        newData.push_back(newRow);
     }
 
     data = newData;

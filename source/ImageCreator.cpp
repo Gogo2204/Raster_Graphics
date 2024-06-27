@@ -8,7 +8,7 @@ Image* ImageCreator::readImageFile(const MyString& fileName)
 	std::ifstream ifs(fileName.c_str());
 
 	if (!ifs.is_open())
-		throw std::exception("Can’t load the image!");
+		throw std::exception("Can not load the image!");
 
 	MyString strMagicNumber;
 	ifs >> strMagicNumber;

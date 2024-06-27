@@ -42,7 +42,7 @@ void BitMap::rotateLeft()
         Bitset newRow(height, Utility::MIN_BITS);
         for (size_t i = 0; i < height; i++)
         {
-            newRow.setNumber(i, data[i].getNumber(j -1));
+            newRow.setNumber(i, data[i].getNumber(j - 1));
         }
         newData.push_back(newRow);
     }

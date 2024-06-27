@@ -15,14 +15,18 @@ void SessionManager::addSession(Session* newSession)
 void SessionManager::switchSession(unsigned index)
 {
 	if (index >= sessions.getSize())
-		return;
+		throw std::logic_error("There is no such session with ID");
 	currentSession = index;
 }
 
 void SessionManager::closeSession()
 {
 	sessions.erase(currentSession);
-	currentSession--;
+	if(currentSession != 0)
+		currentSession--;
+
+	if (currentSession == 0)
+		sessions.clear();
 }
 
 Session* SessionManager::getCurrentSession()

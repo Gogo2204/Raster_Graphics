@@ -41,71 +41,112 @@ Vector<MyString> separateWords(const MyString& str)
 	return words;
 }
 
-void readLine(const MyString& line, bool& wantToExit)
+void readLine(const MyString& line, bool& wantToExit, bool& isSessionStarted)
 {
 	Vector<MyString> wordsInLine = separateWords(line);
 
 	if (!std::strcmp(wordsInLine[0].c_str(), "load"))
 	{
 		Image* newImage = ImageCreator::readImageFile(wordsInLine[1]);
-		Session* ses = new Session(newImage);
-		SessionManager::getInstance().addSession(ses);
+		Session* newSession = new Session(newImage);
+		SessionManager::getInstance().addSession(newSession);
+
+		isSessionStarted = true;
 
 		std::cout << "\nSession with ID: " << SessionManager::getInstance().getSessionId() + 1 << " started" << std::endl;
-		std::cout << "Image '" << wordsInLine[1] << "' added\n" << std::endl;
+		std::cout << "\nImage '" << wordsInLine[1] << "' added\n" << std::endl;
 
 		for (size_t i = 2; i < wordsInLine.getSize(); i++)
 		{
-			ses->addImage(ImageCreator::readImageFile(wordsInLine[i]));
-			std::cout << "Image '" << wordsInLine[i] << "' added\n" << std::endl;
+			newSession->addImage(ImageCreator::readImageFile(wordsInLine[i]));
+			std::cout << "\nImage '" << wordsInLine[i] << "' added\n" << std::endl;
 		}
 	}
 	else if (!std::strcmp(wordsInLine[0].c_str(), "add"))
 	{
+		if (!isSessionStarted)
+			throw std::logic_error("\nThere is no session started!");
+
 		for (size_t i = 1; i < wordsInLine.getSize(); i++)
 		{
 			 SessionManager::getInstance().getCurrentSession()->addImage(ImageCreator::readImageFile(wordsInLine[i]));
-			 std::cout << "Image '" << wordsInLine[i] << "' added\n" << std::endl;
+			 std::cout << "\nImage '" << wordsInLine[i] << "' added\n" << std::endl;
 		}
 	}
 	else if (!std::strcmp(wordsInLine[0].c_str(), "save"))
 	{
+		if (!isSessionStarted)
+			throw std::logic_error("\nThere is no session started!");
+
 		Commands* newCommand = CommandCreator::createCommand(SessionManager::getInstance().getCurrentSession()->getImages(), wordsInLine[0]);
 		SessionManager::getInstance().getCurrentSession()->addCommand(newCommand);
 		SessionManager::getInstance().getCurrentSession()->executeAllCommands();
+
+		unsigned currentSessionId = SessionManager::getInstance().getSessionId() + 1;
+		std::cout << "\nYou saved a session with ID: " << currentSessionId << "!" << std::endl;
+		SessionManager::getInstance().closeSession();
+		if (currentSessionId == 1)
+			isSessionStarted = false;
 	}
 	else if (!std::strcmp(wordsInLine[0].c_str(), "saveas"))
 	{
+		if (!isSessionStarted)
+			throw std::logic_error("\nThere is no session started!");
+
 		Commands* newCommand = CommandCreator::createCommand(SessionManager::getInstance().getCurrentSession()->getImages(), wordsInLine[0], wordsInLine[1]);
 		SessionManager::getInstance().getCurrentSession()->addCommand(newCommand);
 		SessionManager::getInstance().getCurrentSession()->executeAllCommands();
+
+		unsigned currentSessionId = SessionManager::getInstance().getSessionId() + 1;
+		std::cout << "\nYou saved a session with ID: " << currentSessionId << "!" << std::endl;
+		SessionManager::getInstance().closeSession();
+		if (currentSessionId == 1)
+			isSessionStarted = false;
 	}
 	else if (!std::strcmp(wordsInLine[0].c_str(), "close"))
 	{
-		SessionManager::getInstance().getCurrentSession()->executeAllCommands();
+		if (!isSessionStarted)
+			throw std::logic_error("\nThere is no session started!");
+
+		unsigned currentSessionId = SessionManager::getInstance().getSessionId() + 1; // because it starts from zero
+		SessionManager::getInstance().closeSession();
+		std::cout << "\nYou closed a session with ID: " << currentSessionId << "!" << std::endl;
+		if (currentSessionId == 1)
+			isSessionStarted = false;
 	}
 	else if (!std::strcmp(wordsInLine[0].c_str(), "exit"))
 	{
-		SessionManager::getInstance().getCurrentSession()->executeAllCommands();
 		wantToExit = true;
 	}
 	else if (!std::strcmp(wordsInLine[0].c_str(), "grayscale"))
 	{
+		if (!isSessionStarted)
+			throw std::logic_error("\nThere is no session started!");
+
 		Commands* newCommand = CommandCreator::createCommand(SessionManager::getInstance().getCurrentSession()->getImages(), wordsInLine[0]);
 		SessionManager::getInstance().getCurrentSession()->addCommand(newCommand);
 	}
 	else if (!std::strcmp(wordsInLine[0].c_str(), "monochrome"))
 	{
+		if (!isSessionStarted)
+			throw std::logic_error("\nThere is no session started!");
+
 		Commands* newCommand = CommandCreator::createCommand(SessionManager::getInstance().getCurrentSession()->getImages(), wordsInLine[0]);
 		SessionManager::getInstance().getCurrentSession()->addCommand(newCommand);
 	}
 	else if (!std::strcmp(wordsInLine[0].c_str(), "negative"))
 	{
+		if (!isSessionStarted)
+			throw std::logic_error("\nThere is no session started!");
+
 		Commands* newCommand = CommandCreator::createCommand(SessionManager::getInstance().getCurrentSession()->getImages(), wordsInLine[0]);
 		SessionManager::getInstance().getCurrentSession()->addCommand(newCommand);
 	}
 	else if (!std::strcmp(wordsInLine[0].c_str(), "rotate"))
 	{
+		if (!isSessionStarted)
+			throw std::logic_error("\nThere is no session started!");
+
 		if (!std::strcmp(wordsInLine[1].c_str(), "left"))
 		{
 			Commands* newCommand = CommandCreator::createCommand(SessionManager::getInstance().getCurrentSession()->getImages(), wordsInLine[0]+ wordsInLine[1]);
@@ -119,28 +160,38 @@ void readLine(const MyString& line, bool& wantToExit)
 	}
 	else if (!std::strcmp(wordsInLine[0].c_str(), "sessioninfo"))
 	{
+		if (!isSessionStarted)
+			throw std::logic_error("\nThere is no session started!");
+
 		std::cout << SessionManager::getInstance().getCurrentSession()->getSessionInfo();
 		std::cout << std::endl;
 	}
 	else if (!std::strcmp(wordsInLine[0].c_str(), "undo"))
 	{
+		if (!isSessionStarted)
+			throw std::logic_error("\nThere is no session started!");
+
 		SessionManager::getInstance().getCurrentSession()->undo();
 	}
 	else if (!std::strcmp(wordsInLine[0].c_str(), "switch"))
 	{
+		if (!isSessionStarted)
+			throw std::logic_error("\nThere is no session started!");
+
 		unsigned index = Utility::convertToNum(wordsInLine[1][0]);
-		SessionManager::getInstance().switchSession(index);
-		std::cout << "You switched to session with ID: " << index << "!" << std::endl;
+		SessionManager::getInstance().switchSession(index - 1);
+		std::cout << "\nYou switched to session with ID: " << index << "!" << std::endl;
 	}
 	else
 	{
-		throw std::exception("There is no such command!");
+		throw std::exception("\nThere is no such command!");
 	}
 }
 
 int main()
 {    
 	bool wantToExit = false;
+	bool isSessionStarted = false;
 	while (!wantToExit)
 	{
 		std::cout << "> ";
@@ -151,7 +202,7 @@ int main()
 
 		try
 		{
-			readLine(line, wantToExit);
+			readLine(line, wantToExit, isSessionStarted);
 		}
 		catch (std::exception exc)
 		{
